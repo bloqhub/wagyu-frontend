@@ -64,7 +64,7 @@ const useGraphTokenlist = () => {
         setError(true)
       } else {
 
-        //Override for tests
+        // Override for tests
         // registries.tokens[0].chainId=106;
         // registries.tokens[0].address="0xb830d8213e2c3dd621037703d05a5e594387b6be"
         registriesTokens.tokens=registries.tokens
