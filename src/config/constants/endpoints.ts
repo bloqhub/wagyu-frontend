@@ -33,6 +33,18 @@ export const INFO_CLIENT = {
   //   [ChainId.MAINNET]: 'http://167.71.200.226/subgraphs/name/blocks',
 }[chainId]
 
+
+export const REGISTRY_CLIENT = {
+  [ChainId.TESTNET]: 'https://thegraph.testnet.wagyuswap.app/subgraphs/name/WagyuRegistry',
+  // [ChainId.MAINNET]: 'https://thegraph.testnet.wagyuswap.app/subgraphs/name/WagyuRegistry',
+  [ChainId.MAINNET]: 'https://thegraph.wagyuswap.app/subgraphs/name/WagyuRegistry',
+  // }[chainId]
+
+  // export const BLOCKS_CLIENT = {
+  //   [ChainId.TESTNET]: 'http://164.90.190.145/subgraphs/name/blocks',
+  //   [ChainId.MAINNET]: 'http://167.71.200.226/subgraphs/name/blocks',
+}[chainId]
+
 export const BLOCKS_CLIENT = {
   [ChainId.TESTNET]: 'https://thegraph.testnet.wagyuswap.app/subgraphs/name/blocks',
   [ChainId.MAINNET]: 'https://thegraph.wagyuswap.app/subgraphs/name/blocks',

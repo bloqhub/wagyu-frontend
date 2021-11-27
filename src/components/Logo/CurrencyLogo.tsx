@@ -5,6 +5,7 @@ import styled from 'styled-components'
 import useHttpLocations from '../../hooks/useHttpLocations'
 import { WrappedTokenInfo } from '../../state/lists/hooks'
 import getTokenLogoURL from '../../utils/getTokenLogoURL'
+import getTokenLogoURLOrInline from '../../utils/getTokenLogoURLOrInline'
 import Logo from './Logo'
 
 const StyledLogo = styled(Logo)<{ size: string }>`
@@ -21,6 +22,7 @@ export default function CurrencyLogo({
   size?: string
   style?: React.CSSProperties
 }) {
+
   const uriLocations = useHttpLocations(currency instanceof WrappedTokenInfo ? currency.logoURI : undefined)
 
   const srcs: string[] = useMemo(() => {
@@ -28,12 +30,13 @@ export default function CurrencyLogo({
 
     if (currency instanceof Token) {
       if (currency instanceof WrappedTokenInfo) {
-        return [...uriLocations, getTokenLogoURL(currency.address)]
+        return [getTokenLogoURLOrInline(currency.address,currency.logoURI)]
       }
+
       return [getTokenLogoURL(currency.address)]
     }
     return []
-  }, [currency, uriLocations])
+  }, [currency])
 
   if (currency === ETHER) {
     return <VelasIcon width={size} style={style} />

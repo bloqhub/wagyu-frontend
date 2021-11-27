@@ -1,12 +1,15 @@
 import { ChainId, Token } from '@wagyu-swap/sdk'
-import { Tags, TokenInfo, TokenList } from '@uniswap/token-lists'
+import { Tags, TokenInfo, TokenList} from '@uniswap/token-lists'
 import { useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import { DEFAULT_LIST_OF_LISTS } from 'config/constants/lists'
+import useRegistryTokens from 'views/Info/hooks/useRegistryTokens'
 import { AppState } from '../index'
 import DEFAULT_TOKEN_LIST from '../../config/constants/tokenLists/pancake-default.tokenlist.json'
 import { UNSUPPORTED_LIST_URLS } from '../../config/constants/lists'
 import UNSUPPORTED_TOKEN_LIST from '../../config/constants/tokenLists/pancake-unsupported.tokenlist.json'
+
+
 
 type TagDetails = Tags[keyof Tags]
 export interface TagInfo extends TagDetails {
@@ -60,7 +63,7 @@ const listCache: WeakMap<TokenList, TokenAddressMap> | null =
 
 export function listToTokenMap(list: TokenList): TokenAddressMap {
   const result = listCache?.get(list)
-  if (result) return result
+  if (result ) return result
 
   const map = list.tokens.reduce<TokenAddressMap>(
     (tokenMap, tokenInfo) => {
@@ -89,6 +92,7 @@ export function listToTokenMap(list: TokenList): TokenAddressMap {
   listCache?.set(list, map)
   return map
 }
+
 
 export function useAllLists(): {
   readonly [url: string]: {
@@ -135,6 +139,38 @@ function useCombinedTokenMapFromUrls(urls: string[] | undefined): TokenAddressMa
   }, [lists, urls])
 }
 
+function useCombinedTokenMapFromThegraphRegistry(): TokenAddressMap {
+  const lists = useAllLists()
+  const items = useRegistryTokens();
+
+//   return useMemo(() => {
+
+
+
+    return (
+      [items]
+        .reduce((allTokens, currentItem) => {
+
+          try {
+            let combinedTokens=allTokens;
+            if (currentItem.tokens.length>0)
+            {
+              const newTokens = Object.assign(listToTokenMap(currentItem))
+              combinedTokens =  combineMaps(allTokens, newTokens)
+            }
+
+            return combinedTokens;
+          } catch (error) {
+            console.error('Could not show token list due to error', error)
+            return allTokens
+          }
+        }, EMPTY_LIST)
+    )
+
+
+  // }, [items])
+}
+
 // filter out unsupported lists
 export function useActiveListUrls(): string[] | undefined {
   return useSelector<AppState, AppState['lists']['activeListUrls']>((state) => state.lists.activeListUrls)?.filter(
@@ -152,8 +188,12 @@ export function useInactiveListUrls(): string[] {
 export function useCombinedActiveList(): TokenAddressMap {
   const activeListUrls = useActiveListUrls()
   const activeTokens = useCombinedTokenMapFromUrls(activeListUrls)
+  const activeTokensFromThegraph = useCombinedTokenMapFromThegraphRegistry();
+
   const defaultTokenMap = listToTokenMap(DEFAULT_TOKEN_LIST)
-  return combineMaps(activeTokens, defaultTokenMap)
+  const combined=combineMaps(activeTokens, defaultTokenMap)
+
+  return combineMaps(combined, activeTokensFromThegraph)
 }
 
 // all tokens from inactive lists
